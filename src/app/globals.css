@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+@theme {
+  /* Factory Colors */
+  --color-obsidian-canvas: #101010;
+  --color-carbon-lift: #1d1a18;
+  --color-ash-stroke: #3d3a39;
+  --color-graphite-mid: #4d4947;
+  --color-warm-granite: #8a8380;
+  --color-pale-stone: #b8b3b0;
+  --color-bone: #eeeeee;
+  --color-chalk: #fafafa;
+  --color-signal-orange: #ee6018;
+  --color-metric-green: #a0ca92;
+
+  /* Typography */
+  --font-geist: 'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-geist-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Typography — Scale */
+  --text-caption: 12px;
+  --leading-caption: 1;
+  --tracking-caption: -0.24px;
+  --text-body-sm: 14px;
+  --leading-body-sm: 1.43;
+  --text-body: 16px;
+  --leading-body: 1.5;
+  --text-heading: 36px;
+  --leading-heading: 1.1;
+  --tracking-heading: -1.12px;
+  --text-heading-lg: 44px;
+  --leading-heading-lg: 1.12;
+  --tracking-heading-lg: -1.1px;
+  --text-display: 72px;
+  --leading-display: 1;
+  --tracking-display: -2.88px;
+
+  /* Spacing */
+  --spacing-8: 8px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-56: 56px;
+  --spacing-80: 80px;
+  --spacing-96: 96px;
+  --spacing-120: 120px;
+
+  /* Border Radius */
+  --radius-sm: 3px;
+  --radius-lg: 10px;
+  --radius-2xl: 20px;
+}
+
+:root {
+  --color-obsidian-canvas: #101010;
+  --color-carbon-lift: #1d1a18;
+  --color-ash-stroke: #3d3a39;
+  --color-graphite-mid: #4d4947;
+  --color-warm-granite: #8a8380;
+  --color-pale-stone: #b8b3b0;
+  --color-bone: #eeeeee;
+  --color-chalk: #fafafa;
+  --color-signal-orange: #ee6018;
+  --color-metric-green: #a0ca92;
+
+  --font-geist: 'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-geist-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #101010;
+  color: #eeeeee;
+}
+
+body {
+  background-color: #101010;
+  color: #eeeeee;
+  font-family: var(--font-geist);
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+  letter-spacing: -0.015em;
+  margin: 0;
+  padding: 0;
+}
+
+/* Mechanical Button and Link Styles */
+.btn-dark {
+  background-color: #1f1d1c;
+  color: #eeeeee;
+  border-radius: 3px;
+  padding: 0 16px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 400;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.btn-dark:hover {
+  background-color: #282524;
+  border-color: #3d3a39;
+  color: #fafafa;
+}
+
+.btn-light {
+  background-color: #fafafa;
+  color: #101010;
+  border-radius: 3px;
+  padding: 0 16px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+}
+.btn-light:hover {
+  background-color: #e5e5e5;
+}
+
+.ghost-link {
+  background: transparent;
+  border: 1px solid #3d3a39;
+  border-radius: 0px;
+  padding: 0 16px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #eeeeee;
+  font-size: 14px;
+  font-weight: 400;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.ghost-link:hover {
+  border-color: #fafafa;
+  color: #fafafa;
+}
+
+/* High-Contrast Signature Bone Card */
+.bone-card {
+  background-color: #eeeeee;
+  color: #101010;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dark Card with Hairline */
+.factory-card {
+  background-color: transparent;
+  border: 1px solid #1d1a18;
+  border-radius: 10px;
+  padding: 24px;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.factory-card:hover {
+  border-color: #3d3a39;
+}
+
+/* Terminal Pulse */
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.9); }
+}
+
+.status-pulse-orange {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ee6018;
+  animation: pulse-live 2s infinite ease-in-out;
+}
+
+.status-pulse-green {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #a0ca92;
+  animation: pulse-live 2s infinite ease-in-out;
+}
+
+/* Technical Grid */
+.terminal-grid-bg {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
