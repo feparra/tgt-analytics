@@ -25,8 +25,8 @@ export const Hero: React.FC = () => {
     {
       id: '3',
       timestamp: '18:04:27',
-      agent: 'Core::InvoiceReconciler',
-      action: 'Matched 42 vendor statements against ERP ledger',
+      agent: 'Core::DataReconciler',
+      action: 'Reconciled 42 operational records against primary database',
       status: 'synced',
       latency: '210ms',
     },
@@ -39,7 +39,7 @@ export const Hero: React.FC = () => {
     const streamPool: Array<{ agent: string; action: string; latency: string }> = [
       { agent: 'SyncBiz::SupportDispatcher', action: 'Auto-resolved Level-1 ticket for SMB retail client', latency: '98ms' },
       { agent: 'BI::DemandForecaster', action: 'Regenerated weekly revenue vector for Q3 projection', latency: '320ms' },
-      { agent: 'Core::WebhookIngest', action: 'Processed 1,240 Stripe payment events with zero loss', latency: '45ms' },
+      { agent: 'Core::WebhookIngest', action: 'Processed 1,240 transactional telemetry events with zero loss', latency: '45ms' },
       { agent: 'SyncBiz::QuoteSynthesizer', action: 'Drafted tailored RFP response from pricing matrix', latency: '180ms' },
     ];
 

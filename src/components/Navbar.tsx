@@ -25,7 +25,7 @@ export const Navbar: React.FC = () => {
     >
       <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between min-h-[52px]">
         {/* Brand Logo */}
-        <a href="#" className="flex items-center group py-0.5">
+        <a href="/" className="flex items-center group py-0.5">
           <img
             src="/logo.png"
             alt="TGT Analytics"
@@ -36,32 +36,32 @@ export const Navbar: React.FC = () => {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8 text-[13px] font-mono uppercase tracking-[0.04em] text-[#8a8380]">
           <a
-            href="#solutions"
+            href="/#solutions"
             className="hover:text-[#eeeeee] transition-colors duration-150"
           >
             Solutions
           </a>
           <a
-            href="#syncbiz"
+            href="/#syncbiz"
             className="hover:text-[#eeeeee] transition-colors duration-150 flex items-center gap-1.5"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-[#ee6018]"></span>
             SyncBiz Agents
           </a>
           <a
-            href="#bi-analytics"
+            href="/#bi-analytics"
             className="hover:text-[#eeeeee] transition-colors duration-150"
           >
             AI Intelligence
           </a>
           <a
-            href="#architecture"
+            href="/#architecture"
             className="hover:text-[#eeeeee] transition-colors duration-150"
           >
             Architecture
           </a>
           <a
-            href="#roi-calculator"
+            href="/#roi-calculator"
             className="hover:text-[#eeeeee] transition-colors duration-150"
           >
             ROI Metric
@@ -71,17 +71,20 @@ export const Navbar: React.FC = () => {
         {/* Right CTA Actions */}
         <div className="hidden sm:flex items-center gap-3">
           <a
-            href="#contact"
+            href="/#contact"
             className="ghost-link text-[13px] tracking-tight uppercase"
           >
             Request Audit
             <ArrowUpRight className="w-3.5 h-3.5 ml-1.5 opacity-80" />
           </a>
           <a
-            href="#demo-access"
+            href="/#live-dashboard"
             onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('live-dashboard')?.scrollIntoView({ behavior: 'smooth' });
+              const el = document.getElementById('live-dashboard');
+              if (el) {
+                e.preventDefault();
+                el.scrollIntoView({ behavior: 'smooth' });
+              }
             }}
             className="btn-light text-[13px] tracking-tight"
           >
@@ -104,14 +107,14 @@ export const Navbar: React.FC = () => {
         <div className="lg:hidden bg-[#101010] border-b border-[#1d1a18] px-6 py-6 space-y-4">
           <nav className="flex flex-col space-y-3 font-mono text-[13px] uppercase tracking-wider text-[#8a8380]">
             <a
-              href="#solutions"
+              href="/#solutions"
               onClick={() => setMobileMenuOpen(false)}
               className="py-1 hover:text-[#eeeeee]"
             >
               Solutions
             </a>
             <a
-              href="#syncbiz"
+              href="/#syncbiz"
               onClick={() => setMobileMenuOpen(false)}
               className="py-1 hover:text-[#eeeeee] flex items-center gap-2"
             >
@@ -119,21 +122,21 @@ export const Navbar: React.FC = () => {
               SyncBiz Agents
             </a>
             <a
-              href="#bi-analytics"
+              href="/#bi-analytics"
               onClick={() => setMobileMenuOpen(false)}
               className="py-1 hover:text-[#eeeeee]"
             >
               AI Intelligence
             </a>
             <a
-              href="#architecture"
+              href="/#architecture"
               onClick={() => setMobileMenuOpen(false)}
               className="py-1 hover:text-[#eeeeee]"
             >
               Architecture
             </a>
             <a
-              href="#roi-calculator"
+              href="/#roi-calculator"
               onClick={() => setMobileMenuOpen(false)}
               className="py-1 hover:text-[#eeeeee]"
             >
@@ -143,7 +146,7 @@ export const Navbar: React.FC = () => {
 
           <div className="pt-4 border-t border-[#1d1a18] flex flex-col gap-2.5">
             <a
-              href="#contact"
+              href="/#contact"
               onClick={() => setMobileMenuOpen(false)}
               className="ghost-link w-full justify-center text-[13px]"
             >
@@ -151,7 +154,7 @@ export const Navbar: React.FC = () => {
               <ArrowUpRight className="w-3.5 h-3.5 ml-1.5" />
             </a>
             <a
-              href="#live-dashboard"
+              href="/#live-dashboard"
               onClick={() => setMobileMenuOpen(false)}
               className="btn-light w-full justify-center text-[13px]"
             >

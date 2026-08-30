@@ -17,24 +17,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://tgtanalytics.com"),
   title: "TGT Analytics — Real-World Business, AI-Powered Solutions",
   description:
-    "TGT Analytics builds high-throughput software architectures, autonomous operational agents powered by SyncBiz, and predictive Business Intelligence tailored for real-world enterprise & SMB workflows.",
+    "TGT Analytics builds high-throughput software architectures, autonomous operational agents, and predictive Business Intelligence tailored for real-world enterprise & SMB workflows.",
+  alternates: {
+    canonical: "/",
+  },
   keywords: [
-    "AI Business Agents",
-    "SyncBiz Agent",
+    "AI Business Automation",
     "TGT Analytics",
     "Predictive Business Intelligence",
     "Custom Software Engineering",
-    "SMB Workflow Automation",
-    "Enterprise AI Systems",
+    "Enterprise Workflow Optimization",
   ],
-  authors: [{ name: "TGT Analytics" }],
+  authors: [{ name: "TGT Analytics LLC", url: "https://tgtanalytics.com" }],
   openGraph: {
     title: "TGT Analytics — Real-World Business, AI-Powered Solutions",
     description:
-      "Translating complex real-world operational problems into autonomous AI agents, custom software architectures, and predictive Business Intelligence.",
-    url: "https://syncbizagent.com",
+      "Translating complex real-world operational problems into custom software architectures, autonomous workflow agents, and predictive Business Intelligence.",
+    url: "https://tgtanalytics.com",
     siteName: "TGT Analytics",
     locale: "en_US",
     type: "website",
@@ -43,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "TGT Analytics — Real-World Business, AI-Powered Solutions",
     description:
-      "Enterprise software, autonomous SyncBiz business agents, and predictive BI.",
+      "Enterprise software, autonomous workflow agents, and predictive BI.",
   },
 };
 
@@ -54,20 +56,18 @@ export default function RootLayout({
 }) {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "TGT Analytics",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Cloud, Web",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-      name: "Technical Workflow Consultation",
-    },
-    creator: {
-      "@type": "Organization",
-      name: "TGT Analytics LLC",
-      url: "https://syncbizagent.com",
+    "@type": "Organization",
+    name: "TGT Analytics LLC",
+    url: "https://tgtanalytics.com",
+    logo: "https://tgtanalytics.com/logo.png",
+    sameAs: [
+      "https://www.linkedin.com/company/tgtanalytics",
+      "https://github.com/tgtanalytics",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "contact@tgtanalytics.com",
     },
   };
 

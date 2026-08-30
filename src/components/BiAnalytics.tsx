@@ -54,7 +54,7 @@ export const BiAnalytics: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-[15px] font-normal text-[#eeeeee]">Unified Multi-Source Warehouse</h4>
-                <p className="text-[13px] text-[#8a8380]">Connect Stripe, Shopify, QuickBooks, HubSpot, and custom DBs into a coherent single source of truth.</p>
+                <p className="text-[13px] text-[#8a8380]">Connect modern CRMs, ERPs, commerce platforms, and SQL databases into a unified single source of truth.</p>
               </div>
             </div>
           </div>

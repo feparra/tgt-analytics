@@ -40,7 +40,7 @@ const AUDIENCES: AudienceModule[] = [
       'Eliminate the administrative tax that slows down business growth. SyncBiz agents handle repetitive paperwork, order triage, and CRM updates in real time.',
     capabilities: [
       'Real-time WhatsApp & Email customer routing',
-      'Automated PDF invoice validation and accounting sync',
+      'Automated document validation and operational record sync',
       'Dynamic staff shift scheduling & SMS alerts',
       'Inventory stock replenishment triggers',
     ],
@@ -64,20 +64,20 @@ const AUDIENCES: AudienceModule[] = [
     statValue: '< 30 Seconds',
   },
   {
-    id: 'finance',
-    tag: 'FINANCIAL WEALTH AI',
-    title: 'SyncBiz Wealth AI & Financial Intelligence',
-    badge: 'Quantitative Engine',
+    id: 'analytics',
+    tag: 'EXECUTIVE ANALYTICS',
+    title: 'SyncBiz Operational Intelligence & Resource Modeling',
+    badge: 'Predictive Engine',
     description:
-      'Autonomous capital co-pilot and cash flow telemetry. Dynamic capital allocation modeling and liquidity forecasting built with institutional rigor.',
+      'Autonomous operational forecasting and resource utilization telemetry. Dynamic workload allocation modeling and bottleneck forecasting built with enterprise rigor.',
     capabilities: [
-      'Algorithmic portfolio resilience tracking',
-      'Cash runway burn-rate simulations',
-      'Autonomous payroll & expense reconciliation',
-      'Encrypted isolated financial vault architecture',
+      'Operational workload resilience tracking',
+      'Capacity runway burn-rate simulations',
+      'Autonomous task & schedule reconciliation',
+      'Isolated per-tenant operational database architecture',
     ],
     statLabel: 'FORECAST ACCURACY',
-    statValue: '99.4% Rigor',
+    statValue: '99.4% Precision',
   },
 ];
 
@@ -184,7 +184,7 @@ export const SyncBizFeature: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-[#8a8380]">DATA ISOLATION:</span>
-                <span className="text-[#a0ca92]">AES-256 Vaulted</span>
+                <span className="text-[#a0ca92]">Encrypted &amp; Isolated</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#8a8380]">HUMAN OVERRIDE:</span>

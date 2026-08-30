@@ -10,7 +10,7 @@ const STEPS: ArchitectureStep[] = [
     title: 'Multi-Source Ingest & Normalization',
     subtitle: 'Zero-loss asynchronous data stream intake',
     description:
-      'We ingest structured and unstructured telemetry from WhatsApp, Webhooks, Email inboxes, Stripe events, PDF invoices, and legacy relational databases into a sanitized queuing layer.',
+      'We ingest structured and unstructured telemetry from webhooks, API streams, email inboxes, business documents, and relational databases into a sanitized queuing layer.',
     specs: [
       'Kafka / RabbitMQ buffered message pipeline',
       'AES-256 in-transit & at-rest encryption',
@@ -25,7 +25,7 @@ const STEPS: ArchitectureStep[] = [
     description:
       'The core TGT agent engine assigns tasks to specialized SyncBiz agents (e.g. LeadRouter, AccountingReconciler, SupportDispatcher). High-risk operations pass through strict deterministic validation rules and optional human-in-the-loop approvals.',
     specs: [
-      'Isolated memory vaults per tenant',
+      'Isolated execution contexts per tenant',
       'Deterministic rule engine & prompt evaluation',
       'Human-in-the-loop escalation circuit breakers',
       'Low-latency model inference router',
@@ -141,8 +141,8 @@ export const Architecture: React.FC = () => {
                 <span className="text-[#a0ca92]">Multi-Region Active</span>
               </div>
               <div className="p-2.5 bg-[#101010] border border-[#1d1a18] rounded-[3px] text-[#eeeeee] flex justify-between items-center">
-                <span>AUDIT ENCLAVE:</span>
-                <span className="text-[#fafafa]">Immutable Ledger</span>
+                <span>AUDIT LOGGING:</span>
+                <span className="text-[#fafafa]">Immutable Action History</span>
               </div>
             </div>
           </div>

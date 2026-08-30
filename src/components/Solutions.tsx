@@ -13,7 +13,7 @@ const SOLUTIONS: SolutionItem[] = [
     features: [
       'Hexagonal & Clean architecture standards',
       'Robust API bridges & Legacy ERP/CRM connectors',
-      'Bank-grade isolation and zero-leak auth systems',
+      'Enterprise tenant isolation and role-based access controls',
       'Custom web & mobile internal tooling interfaces',
     ],
     metrics: {
@@ -31,7 +31,7 @@ const SOLUTIONS: SolutionItem[] = [
       'Real-world business problems solved with autonomous execution. Our SyncBiz agents orchestrate lead intake, customer support routing, document synthesis, and administrative workflows 24/7 without manual friction.',
     features: [
       'Autonomous CRM & lead qualification pipeline',
-      'Automated invoice ingestion & bookkeeping reconciliation',
+      'Automated document ingestion and operational data reconciliation',
       'Multi-channel dispatch (Email, WhatsApp, Slack, Web)',
       'Deterministic human-in-the-loop escalation rules',
     ],

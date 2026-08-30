@@ -98,8 +98,8 @@ export const ContactForm: React.FC = () => {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="flex items-center justify-between pb-4 border-b border-[#1d1a18] font-mono text-[12px] text-[#8a8380]">
-                  <span>DISPATCH AUDIT SPEC</span>
-                  <span className="text-[#ee6018]">SECURE FORM</span>
+                  <span>ENGINEERING CONSULTATION INTAKE</span>
+                  <span className="text-[#8a8380]">CONFIDENTIAL INQUIRY</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -177,13 +177,21 @@ export const ContactForm: React.FC = () => {
                   ></textarea>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="btn-light w-full justify-center text-[14px] font-medium tracking-tight uppercase"
-                >
-                  {isSubmitting ? 'Transmitting Specifications...' : 'Schedule Technical Consultation'}
-                </button>
+                <div className="pt-2">
+                  <p className="text-[12px] text-[#8a8380] mb-4 leading-normal">
+                    TGT Analytics respects your privacy. Information submitted is strictly used to deliver tailored technical roadmaps. See our{' '}
+                    <a href="/privacy" className="text-[#eeeeee] underline hover:text-[#fafafa]">
+                      Privacy Policy
+                    </a>.
+                  </p>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="btn-light w-full justify-center text-[14px] font-medium tracking-tight uppercase"
+                  >
+                    {isSubmitting ? 'Transmitting Specifications...' : 'Schedule Technical Consultation'}
+                  </button>
+                </div>
               </form>
             )}
           </div>
