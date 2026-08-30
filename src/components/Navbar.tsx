@@ -24,16 +24,13 @@ export const Navbar: React.FC = () => {
       }`}
     >
       <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
-        {/* Brand Wordmark & Logo */}
-        <a href="#" className="flex items-center gap-3 group">
+        {/* Brand Logo */}
+        <a href="#" className="flex items-center group py-1">
           <img
             src="/logo.png"
             alt="TGT Analytics"
-            className="h-7 md:h-8 w-auto object-contain transition-transform duration-150 group-hover:scale-105"
+            className="h-10 sm:h-12 w-auto object-contain transition-transform duration-150 group-hover:scale-105"
           />
-          <span className="font-mono text-[13px] tracking-[0.18em] uppercase text-[#eeeeee] font-medium hidden sm:inline-block">
-            TGT // ANALYTICS
-          </span>
         </a>
 
         {/* Desktop Navigation */}
