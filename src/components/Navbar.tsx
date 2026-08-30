@@ -19,17 +19,17 @@ export const Navbar: React.FC = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
         isScrolled
-          ? 'bg-[#101010]/90 backdrop-blur-md border-b border-[#1d1a18]'
-          : 'bg-transparent'
+          ? 'bg-[#101010]/95 backdrop-blur-md border-b border-[#1d1a18] py-2'
+          : 'bg-transparent py-4 md:py-5'
       }`}
     >
-      <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between">
         {/* Brand Logo */}
-        <a href="#" className="flex items-center group py-1">
+        <a href="#" className="flex items-center group">
           <img
             src="/logo.png"
             alt="TGT Analytics"
-            className="h-10 sm:h-12 w-auto object-contain transition-transform duration-150 group-hover:scale-105"
+            className="h-7 sm:h-8 max-h-[34px] w-auto object-contain transition-transform duration-150 group-hover:scale-105"
           />
         </a>
 

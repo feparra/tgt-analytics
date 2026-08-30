@@ -65,7 +65,7 @@ export const Hero: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-6 max-w-[1200px] mx-auto border-b border-[#1d1a18]">
+    <section className="relative pt-36 pb-20 md:pt-44 md:pb-28 px-6 max-w-[1200px] mx-auto border-b border-[#1d1a18]">
       {/* Background technical grain */}
       <div className="absolute inset-0 terminal-grid-bg opacity-40 pointer-events-none -z-10"></div>
 
