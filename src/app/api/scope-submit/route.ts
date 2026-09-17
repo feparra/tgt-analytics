@@ -229,7 +229,7 @@ export async function POST(req: Request): Promise<Response> {
   pickupStore.set(sessionId, { payload, ts: Date.now() });
 
   const webhookUrl = process.env.SCOPE_WEBHOOK_URL;
-  const notifyEmail = process.env.SCOPE_NOTIFY_EMAIL || 'contact@tgtanalytics.com';
+  const notifyEmail = process.env.SCOPE_NOTIFY_EMAIL || 'fparra@tgtanalytics.com';
 
   const delivered: string[] = [];
   const deliveryErrors: string[] = [];
