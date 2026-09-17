@@ -66,6 +66,13 @@ export const Navbar: React.FC = () => {
           >
             ROI Metric
           </a>
+          <a
+            href="/scope-architect"
+            className="hover:text-[#eeeeee] transition-colors duration-150 flex items-center gap-1.5"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ee6018]"></span>
+            Scope Architect
+          </a>
         </nav>
 
         {/* Right CTA Actions */}
@@ -141,6 +148,14 @@ export const Navbar: React.FC = () => {
               className="py-1 hover:text-[#eeeeee]"
             >
               ROI Metric
+            </a>
+            <a
+              href="/scope-architect"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-1 hover:text-[#eeeeee] flex items-center gap-2"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ee6018]"></span>
+              Scope Architect
             </a>
           </nav>
 

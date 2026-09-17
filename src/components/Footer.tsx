@@ -55,6 +55,12 @@ export const Footer: React.FC = () => {
                 ROI Calculator
               </a>
             </li>
+            <li>
+              <a href="/scope-architect" className="hover:text-[#eeeeee] transition-colors flex items-center gap-1">
+                <span>Project Scope Architect</span>
+                <span className="text-[10px] font-mono text-[#ee6018] font-bold">AI</span>
+              </a>
+            </li>
           </ul>
         </div>
 
