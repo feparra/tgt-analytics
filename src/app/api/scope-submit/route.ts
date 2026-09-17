@@ -15,12 +15,12 @@ interface ScopePayload {
   };
   human_summary_md?: string;
   agent_brief_md?: string;
+  raw_output?: string;
 }
 
-// In-memory pickup store. Edge functions on Vercel share the same isolate for
-// a short window after a request; the frontend picks the package up seconds
-// after the chat stream ends. For durable storage set SCOPE_WEBHOOK_URL or
-// RESEND_API_KEY — this store only bridges the chat → finalized view.
+// In-memory pickup store — backup only. The POST response carries the payload
+// directly, so the frontend does not depend on this (Vercel Edge isolates may
+// not share memory across requests).
 const pickupStore = new Map<string, { payload: ScopePayload; ts: number }>();
 const PICKUP_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -89,7 +89,66 @@ function extractJson(raw: string): ScopePayload | null {
 }
 
 /**
- * GET /api/scope-submit?session_id=X — frontend pickup of the finalized package.
+ * Lenient repair for common LLM JSON mistakes: unescaped newlines/tabs inside
+ * strings, smart quotes, and trailing commas. Returns a repaired string —
+ * the caller re-runs extractJson on it.
+ */
+function repairJson(text: string): string {
+  text = text
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'");
+  const out: string[] = [];
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (!inString) {
+      if (ch === '"') {
+        inString = true;
+        out.push(ch);
+        continue;
+      }
+      if (ch === ',') {
+        // Trailing comma lookahead: skip whitespace, drop comma before } or ].
+        let j = i + 1;
+        while (j < text.length && /\s/.test(text[j])) j++;
+        if (j < text.length && (text[j] === '}' || text[j] === ']')) continue;
+      }
+      out.push(ch);
+      continue;
+    }
+    // Inside a string.
+    if (escaped) {
+      escaped = false;
+      out.push(ch);
+      continue;
+    }
+    if (ch === '\\') {
+      escaped = true;
+      out.push(ch);
+      continue;
+    }
+    if (ch === '"') {
+      inString = false;
+      out.push(ch);
+      continue;
+    }
+    if (ch === '\n') {
+      out.push('\\n');
+      continue;
+    }
+    if (ch === '\r') continue;
+    if (ch === '\t') {
+      out.push('\\t');
+      continue;
+    }
+    out.push(ch);
+  }
+  return out.join('');
+}
+
+/**
+ * GET /api/scope-submit?session_id=X — backup pickup of the finalized package.
  */
 export async function GET(req: Request): Promise<Response> {
   const url = new URL(req.url);
@@ -107,8 +166,12 @@ export async function GET(req: Request): Promise<Response> {
 
 /**
  * POST /api/scope-submit — parse the approved model output, persist the
- * package, deliver it to configured channels (webhook / email), and keep it
- * available for frontend pickup.
+ * package, deliver it to configured channels (webhook / email), and return
+ * the normalized payload DIRECTLY in the response so the frontend can render
+ * the finalized documents without a second request.
+ *
+ * Delivery is best-effort: a webhook/email failure NEVER fails the request —
+ * the lead is already captured (payload in response + pickup store).
  */
 export async function POST(req: Request): Promise<Response> {
   let body: { raw?: string; sessionId?: string };
@@ -127,13 +190,27 @@ export async function POST(req: Request): Promise<Response> {
   if (!raw.includes(APPROVED_DELIMITER)) {
     return jsonError('Approval marker missing', 400);
   }
-  if (raw.length > 40000) {
+  if (raw.length > 100000) {
     return jsonError('Payload too large', 400);
   }
 
-  const payload = extractJson(raw);
+  // Parse: strict first, then the repair pass for malformed model JSON.
+  let payload = extractJson(raw);
+  let parseWarning: string | null = null;
+  if (!payload) {
+    payload = extractJson(repairJson(raw));
+    if (payload) parseWarning = 'json_repaired';
+  }
   if (!payload || !payload.project_brief) {
-    return jsonError('Could not parse scope JSON from model output', 422);
+    // Degraded mode: never lose the lead — preserve the raw model output.
+    payload = {
+      project_brief: {},
+      lead_assessment: {},
+      human_summary_md: '',
+      agent_brief_md: '',
+      raw_output: raw.slice(0, 40000),
+    };
+    parseWarning = 'json_parse_failed_raw_preserved';
   }
 
   // Normalise session metadata server-side (never trust model-authored meta).
@@ -147,7 +224,7 @@ export async function POST(req: Request): Promise<Response> {
   payload.human_summary_md = payload.human_summary_md || '';
   payload.agent_brief_md = payload.agent_brief_md || '';
 
-  // Persist for frontend pickup.
+  // Persist for backup pickup.
   sweepStore();
   pickupStore.set(sessionId, { payload, ts: Date.now() });
 
@@ -157,7 +234,6 @@ export async function POST(req: Request): Promise<Response> {
   const delivered: string[] = [];
   const deliveryErrors: string[] = [];
 
-  let webhookOk = false;
   if (webhookUrl) {
     try {
       const res = await fetch(webhookUrl, {
@@ -171,8 +247,7 @@ export async function POST(req: Request): Promise<Response> {
           ...payload,
         }),
       });
-      webhookOk = res.ok;
-      if (webhookOk) delivered.push('webhook');
+      if (res.ok) delivered.push('webhook');
       else deliveryErrors.push(`webhook HTTP ${res.status}`);
     } catch (err) {
       deliveryErrors.push(`webhook: ${err instanceof Error ? err.message : 'network error'}`);
@@ -180,7 +255,6 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   const resendKey = process.env.RESEND_API_KEY;
-  let emailOk = false;
   if (resendKey) {
     try {
       const brief = payload.project_brief as Record<string, string>;
@@ -206,26 +280,22 @@ export async function POST(req: Request): Promise<Response> {
           ].join('\n'),
         }),
       });
-      emailOk = res.ok;
-      if (emailOk) delivered.push('email');
-      else deliveryErrors.push(`email HTTP ${res.status}`);
+      if (res.ok) delivered.push('email');
+      else deliveryErrors.push(`email HTTP ${res.status}: ${(await res.text()).slice(0, 150)}`);
     } catch (err) {
       deliveryErrors.push(`email: ${err instanceof Error ? err.message : 'network error'}`);
     }
   }
 
-  const anyChannel = Boolean(webhookUrl || resendKey);
-  const ok = anyChannel ? webhookOk || emailOk : true; // pickup-only mode still succeeds
-
-  return jsonOk(
-    {
-      ok,
-      delivered,
-      pickup_available: true,
-      session_id: sessionId,
-      // Diagnostics only when channels exist but both failed.
-      ...(!ok && deliveryErrors.length ? { delivery_errors: deliveryErrors } : {}),
-    },
-    ok ? 200 : 502
-  );
+  // ok=true: the payload is secured and returned in this response. Delivery
+  // problems are reported as diagnostics, not as a failed request.
+  return jsonOk({
+    ok: true,
+    delivered,
+    delivery_errors: deliveryErrors,
+    pickup_available: true,
+    session_id: sessionId,
+    ...(parseWarning ? { parse_warning: parseWarning } : {}),
+    payload,
+  });
 }

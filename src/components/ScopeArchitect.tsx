@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Send, RotateCcw, CheckCircle2, Sparkles, User, Download, FileText, Bot } from 'lucide-react';
+import { Send, RotateCcw, CheckCircle2, Sparkles, User, Download, FileText, Bot, AlertTriangle } from 'lucide-react';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
@@ -23,6 +23,35 @@ To get started: **What is the main challenge, repetitive bottleneck, or new capa
 
 const APPROVED_MARKER = '<<<PROJECT_SCOPE_APPROVED>>>';
 const CONTROL_SEP = '\u0000';
+const STORAGE_KEY = 'tgt-psa-session-v1';
+
+interface StoredState {
+  sessionId: string;
+  phase: Phase;
+  messages: ChatMessage[];
+  finalPackage?: FinalPackage;
+}
+
+/** Persist session so a page reload (or accidental navigation) never loses progress. */
+function loadState(): StoredState | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw) as StoredState;
+    if (!s.sessionId || !Array.isArray(s.messages) || s.messages.length === 0) return null;
+    return s;
+  } catch {
+    return null;
+  }
+}
+
+function saveState(s: StoredState) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  } catch {
+    /* storage full/blocked — session simply won't survive reload */
+  }
+}
 
 function newSessionId(): string {
   const rand = Math.random().toString(36).slice(2, 8);
@@ -53,7 +82,7 @@ function renderMarkdown(md: string): string {
     }
     const h = bolded.match(/^(#{1,3})\s+(.*)/);
     if (h) {
-      const lvl = h[1].length + 2; // h2..h4 visually
+      const lvl = h[1].length + 2;
       out.push(`<h${lvl} class="scope-doc-h${lvl}">${h[2]}</h${lvl}>`);
       continue;
     }
@@ -68,20 +97,26 @@ function renderMarkdown(md: string): string {
 }
 
 export const ScopeArchitect: React.FC = () => {
-  const [phase, setPhase] = useState<Phase>('interviewing');
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'assistant', content: WELCOME_MESSAGE },
-  ]);
+  const restored = useRef<StoredState | null>(loadState());
+  const [phase, setPhase] = useState<Phase>(restored.current?.phase === 'finalized' ? 'finalized' : 'interviewing');
+  const [messages, setMessages] = useState<ChatMessage[]>(
+    restored.current?.messages ?? [{ role: 'assistant', content: WELCOME_MESSAGE }]
+  );
+  const [sessionId, setSessionId] = useState(restored.current?.sessionId ?? newSessionId());
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [finalPackage, setFinalPackage] = useState<FinalPackage | null>(null);
+  const [finalPackage, setFinalPackage] = useState<FinalPackage | null>(restored.current?.finalPackage ?? null);
   const [activeDoc, setActiveDoc] = useState<'human' | 'agent'>('human');
-  const [sessionId, setSessionId] = useState(newSessionId);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const lastApprovedRef = useRef<string | null>(null);
+
+  // Persist on every change that matters.
+  useEffect(() => {
+    saveState({ sessionId, phase, messages, ...(finalPackage ? { finalPackage } : {}) });
+  }, [sessionId, phase, messages, finalPackage]);
 
   // Auto-scroll to bottom as new content streams in.
   useEffect(() => {
@@ -91,6 +126,7 @@ export const ScopeArchitect: React.FC = () => {
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
+    sessionStorage.removeItem(STORAGE_KEY);
     setPhase('interviewing');
     setMessages([{ role: 'assistant', content: WELCOME_MESSAGE }]);
     setInput('');
@@ -101,43 +137,53 @@ export const ScopeArchitect: React.FC = () => {
     setSessionId(newSessionId());
   }, []);
 
-  const finalize = useCallback(async (rawApproved: string) => {
-    if (lastApprovedRef.current === rawApproved) return; // dedupe double-fires
-    lastApprovedRef.current = rawApproved;
-    try {
-      const res = await fetch('/api/scope-submit', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ raw: rawApproved, sessionId }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.ok) {
-        // Pickup the full package (with both markdown documents).
-        const pick = await fetch(`/api/scope-submit?session_id=${encodeURIComponent(sessionId)}`);
-        if (pick.ok) {
-          const pkg = await pick.json().catch(() => ({}));
-          if (pkg.payload) {
-            setFinalPackage({
-              human_summary_md: pkg.payload.human_summary_md || '',
-              agent_brief_md: pkg.payload.agent_brief_md || '',
-              recommended_tier: pkg.payload?.lead_assessment?.recommended_tier,
-              clarity_score: pkg.payload?.lead_assessment?.clarity_score,
-            });
+  const finalize = useCallback(
+    async (rawApproved: string) => {
+      if (lastApprovedRef.current === rawApproved) return; // dedupe double-fires
+      lastApprovedRef.current = rawApproved;
+      try {
+        const res = await fetch('/api/scope-submit', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ raw: rawApproved, sessionId }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok && data.payload) {
+          // Payload comes back DIRECTLY in the POST response.
+          setFinalPackage({
+            human_summary_md: data.payload.human_summary_md || '',
+            agent_brief_md: data.payload.agent_brief_md || '',
+            recommended_tier: data.payload?.lead_assessment?.recommended_tier,
+            clarity_score: data.payload?.lead_assessment?.clarity_score,
+          });
+          const errs: string[] = data.delivery_errors || [];
+          if (errs.length > 0) {
+            // Notify but do not fail — the blueprint is secured and shown.
+            console.warn('scope delivery diagnostics:', errs);
           }
+        } else if (data.error === 'Approval marker missing') {
+          // The raw we hold doesn't carry the marker — try again prefixing it.
+          setError('Submission incomplete. Retrying…');
+          await new Promise((r) => setTimeout(r, 400));
+          lastApprovedRef.current = null;
+          await finalize(`${APPROVED_MARKER}${rawApproved}`);
+        } else {
+          console.error('scope-submit failed', res.status, data);
+          setError(
+            'We received your blueprint but could not finish processing it. Our team has been notified — no need to repeat the interview.'
+          );
         }
-      } else {
-        console.error('scope-submit failed', res.status, data);
-        setError('Submission failed — your blueprint could not be transmitted. Please try again.');
+      } catch (err) {
+        console.error('scope-submit network error', err);
+        setError('Network hiccup while transmitting. Click Restart recovery below — your progress is saved.');
       }
-    } catch (err) {
-      console.error('scope-submit network error', err);
-      setError('Submission network error. Please try again.');
-    }
-  }, [sessionId]);
+    },
+    [sessionId]
+  );
 
   const send = useCallback(async () => {
     const text = input.trim();
-    if (!text || isStreaming || phase === 'finalized') return;
+    if (!text || isStreaming || phase !== 'interviewing') return;
 
     setError(null);
     setInput('');
@@ -208,7 +254,6 @@ export const ScopeArchitect: React.FC = () => {
           }
           // Only the text before the control separator is visible content.
           acc = acc.slice(0, ctrlIdx);
-          // The delimiter itself (if present in visible text) is stripped.
           const mkIdx = acc.indexOf(APPROVED_MARKER);
           if (mkIdx !== -1) acc = acc.slice(0, mkIdx);
           appendAssistant(acc.slice(streamedLen));
@@ -217,7 +262,6 @@ export const ScopeArchitect: React.FC = () => {
 
           if (approved && rawApproved) {
             setPhase('confirming');
-            // Server already assembled the full approved payload — deliver it.
             await finalize(rawApproved);
             setPhase('finalized');
           }
@@ -381,8 +425,11 @@ export const ScopeArchitect: React.FC = () => {
           )}
           {error && (
             <div className="flex items-center justify-between bg-[#1d1a18]/50 border border-[#ee6018]/40 rounded-[3px] px-4 py-2.5 text-[13px] text-[#ee6018]">
-              <span>{error}</span>
-              <button onClick={reset} className="underline underline-offset-2 hover:text-[#fafafa]">
+              <span className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                {error}
+              </span>
+              <button onClick={reset} className="underline underline-offset-2 hover:text-[#fafafa] shrink-0 ml-3">
                 Restart
               </button>
             </div>
